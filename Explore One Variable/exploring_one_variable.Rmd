@@ -8,60 +8,134 @@ output: html_notebook
 ### Diamonds
 
 ```{r}
-plot(cars)
+library(ggplot2)
+data(diamonds)
+
+summary(diamonds)
+?diamonds
 ```
 
 
 ***
 
 ### Price Histogram
+```{r}
+ggplot(aes(x = price), data = diamonds) + geom_histogram(bins = 15, fill = '#099DD9', color = 'black') + scale_x_continuous()
+```
+
 
 ***
 
 ### Price Histogram Summary
+```{r}
+summary(diamonds$price)
+```
+
 ***
 
 ### Daimond Counts
+How many diamonds cost less than $500?
+How many diamonds cost less than $250?
+How many diamonds cost $15,000 or more?
+```{r}
+nrow(subset(diamonds, diamonds$price < 500))
+nrow(subset(diamonds, diamonds$price < 250))
+nrow(subset(diamonds, diamonds$price >= 15000))
+
+```
+
 ***
 
 ### Cheaper Diamonds
+```{r}
+ggplot(aes(x = price), data = diamonds) + geom_histogram(bins = 30, fill = '#099DD9', color = 'black') + scale_x_continuous(breaks = seq(300, 1000, 50), limits = c(300, 1000))
+```
+
 
 ***
 
 ### Price by Cut Histograms
+```{r}
+ggplot(aes(x = price), data = diamonds) + geom_histogram(bins = 15, fill = '#099DD9', color = 'black') + scale_x_continuous(breaks = seq(300, 2000, 500), limits = c(300, 2000)) + facet_wrap(~cut)
+```
+
 
 ***
 
 ### Price by Cut
+Which cut has the highest priced diamond?
+Which cut has the lowest priced diamond?
+Which cut has the lowest median price?
+```{r}
+by(diamonds$price, diamonds$cut, summary)
+```
+
 
 ***
 
 ### Scales and Multiple Histograms
+```{r}
+ggplot(aes(x = price), data = diamonds) + geom_histogram(bins = 15, fill = '#099DD9', color = 'black') + scale_x_continuous(breaks = seq(300, 2000, 500), limits = c(300, 2000)) + facet_wrap(~cut, scales = 'free_y')
+```
 
 ***
 
 ### Price per Carat by Cut
+```{r}
+ggplot(aes(x = price/carat), data = diamonds) + geom_histogram(bins = 20, fill = '#099DD0', color = 'black') + scale_x_log10() + facet_wrap(~cut, scales = 'free_y')
+```
+
 
 ***
 
 ### Price Box Plots
+```{r}
+qplot(x = cut, y = price, data = diamonds, geom = 'boxplot') + coord_cartesian(ylim = c(0, 10000))
+```
+```{r}
+qplot(x = color, y = price, data = diamonds, geom = 'boxplot') + coord_cartesian(ylim = c(0, 10000))
+```
+```{r}
+qplot(x = clarity, y = price, data = diamonds, geom = 'boxplot') + coord_cartesian(ylim = c(0, 10000))
+```
+
 
 ***
 
 ### Interquartile Range - IQR
+```{r}
+by(diamonds$price, diamonds$color, summary)
+IQR(subset(diamonds, color == 'D')$price)
+IQR(subset(diamonds, color == 'J')$price)
+```
+
 
 ***
 
 ### Price per Carat Box Plots by Color
+```{r}
+ggplot(aes(x = color, y = price/carat), data = diamonds) + geom_boxplot() + coord_cartesian(ylim = c(0, 7500))
+```
+
 
 ***
 
 ### Carat Frequency Polygon
+```{r}
+ggplot(aes(x = carat), data = diamonds) + geom_freqpoly(binwidth = .1)
+table(diamonds$carat)
+```
+
 
 ***
 
 ### Data Wrangling with R
+https://s3.amazonaws.com/udacity-hosted-downloads/ud651/DataWranglingWithR.pdf
+tidyr -a package that reshapes the layout of your data
 
+dplyr - a package that helps you transform tidy, tabular data
+
+https://www.rstudio.com/resources/cheatsheets/
 ***
 
 ### Gapminder Data
@@ -69,4 +143,32 @@ plot(cars)
 ***
 
 ### Exploring Your Friends' Birthdays
+How many people share your birthday? Do you know them?
+
+Which month contains the most number of birthdays?
+
+How many birthdays are in each month?
+
+Which day of the year has the most number of birthdays?
+
+Do you have at least 365 friends that have birthdays on everyday of the year?
+
+```{r}
+birth <- read.csv('birthdaysExample.csv')
+birth$dates <- strptime(birth$dates, format = "%m/%d/%y")
+birth$month <- strftime(birth$dates, format = "%m")
+birth$day <- strftime(birth$dates, format = "%d")
+birth$year <- strftime(birth$dates, format = "%y")
+
+nrow(subset(birth, day == 25 & month == 10))
+
+ggplot(aes(x = month), data = birth) + geom_histogram(stat = "count")
+
+table(birth$month)
+
+ggplot(aes(x = day), data = birth) + geom_histogram(stat = "count")
+
+ggplot(aes(x = day), data = birth) + geom_histogram(binwidth = 1, stat = "count") + facet_wrap(~month)
+```
+
 
