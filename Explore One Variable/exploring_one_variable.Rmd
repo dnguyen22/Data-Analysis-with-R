@@ -1,0 +1,72 @@
+---
+title: "Problem Set: Explore One Variable"
+output: html_notebook
+---
+
+***
+
+### Diamonds
+
+```{r}
+plot(cars)
+```
+
+
+***
+
+### Price Histogram
+
+***
+
+### Price Histogram Summary
+***
+
+### Daimond Counts
+***
+
+### Cheaper Diamonds
+
+***
+
+### Price by Cut Histograms
+
+***
+
+### Price by Cut
+
+***
+
+### Scales and Multiple Histograms
+
+***
+
+### Price per Carat by Cut
+
+***
+
+### Price Box Plots
+
+***
+
+### Interquartile Range - IQR
+
+***
+
+### Price per Carat Box Plots by Color
+
+***
+
+### Carat Frequency Polygon
+
+***
+
+### Data Wrangling with R
+
+***
+
+### Gapminder Data
+
+***
+
+### Exploring Your Friends' Birthdays
+
