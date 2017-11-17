@@ -170,5 +170,137 @@ ggplot(aes(x = day), data = birth) + geom_histogram(stat = "count")
 
 ggplot(aes(x = day), data = birth) + geom_histogram(binwidth = 1, stat = "count") + facet_wrap(~month)
 ```
+*************************************************************************************************************
+
+# Exploring Two Variables
 
 
+***
+
+### price vs. x
+```{r}
+ggplot(aes(x = x, y = price), data = diamonds) + geom_point()
+```
+
+***
+
+### Findings - price vs. x
+Price increases exponentially with x. There are outliers with x = 0.
+***
+
+### Correlations
+```{r}
+with(diamonds, cor.test(price, x))
+
+with(diamonds, cor.test(price, y))
+
+with(diamonds, cor.test(price, z))
+```
+
+***
+
+### price vs. depth
+```{r}
+ggplot(aes(x = depth, y = price), data = diamonds) + geom_point()
+```
+
+***
+
+### Adjustments - price vs. depth
+```{r}
+ggplot(aes(x = depth, y = price), data = diamonds) + geom_point(alpha = 1/100) + scale_x_continuous(breaks = seq(58, 64, 2), limits = c(58, 64))
+```
+
+***
+
+### Typical Depth Range
+***
+
+### Correlation - price and depth
+```{r}
+with(diamonds, cor.test(depth, price))
+```
+
+***
+
+### price vs. carat
+```{r}
+ggplot(aes(x = carat, y = price), data = diamonds) + geom_point() + xlim(0, quantile(diamonds$carat, .99)) + ylim(0, quantile(diamonds$price, .99))
+```
+
+***
+
+### price vs. volume
+```{r}
+diamonds$volume <- diamonds$x * diamonds$y * diamonds$z
+
+ggplot(aes(x = volume, y = price), data = diamonds) + geom_point()
+```
+```{r}
+library(plyr)
+count(diamonds$volume == 0)
+detach("package:plyr", unload=TRUE)
+```
+
+***
+
+### Findingns - price vs. volume
+
+***
+
+### Correlations on Subsets
+```{r}
+with(subset(diamonds, diamonds$volume > 0 & diamonds$volume < 800), cor.test(price, volume))
+```
+
+***
+
+### Adjustments - price vs. volume
+```{r}
+ggplot(aes(x = volume, y = price), data = subset(diamonds, diamonds$volume > 0 & diamonds$volume < 800)) + geom_point(alpha = 1/50) + geom_smooth()
+```
+
+***
+
+### Mean Price by Clarity
+```{r}
+library(dplyr)
+diamondsByClarity <- diamonds %>%
+  group_by(clarity) %>%
+  summarise(mean_price = mean(price),
+            median_price = median(price),
+            min_price = min(price),
+            max_price = max(price),
+            n = n()) 
+head(diamondsByClarity)
+```
+
+***
+
+### Bar Charts of Mean Price
+```{r}
+diamondsByColor <- diamonds %>%
+  group_by(color) %>%
+  summarise(mean_price = mean(price),
+            median_price = median(price),
+            min_price = min(price),
+            max_price = max(price),
+            n = n()) 
+head(diamondsByColor)
+
+library(gridExtra)
+
+p1 <- ggplot(aes(x = clarity, y = mean_price), data = diamondsByClarity) + geom_col()
+
+p2 <- ggplot(aes(x = color, y = mean_price), data = diamondsByColor) + geom_col()
+
+grid.arrange(p1, p2, ncol = 1)
+```
+
+***
+
+### Trends in Mean Price
+As clarity improves, mean price of the diamond decreases. SI2, although not the worst clarity, is the most expensive category. As diamond color improves, the price decreases.
+***
+
+### Gapminder Revisited
