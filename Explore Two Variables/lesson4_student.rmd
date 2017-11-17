@@ -12,7 +12,13 @@ Notes:
 Notes:
 
 ```{r Scatterplots}
+library(ggplot2)
+pf <- read.csv('pseudo_facebook.tsv', sep = '\t')
 
+
+qplot(x = age, y = friend_count, data = pf)
+
+ggplot(aes(x = age, y = friend_count), data = pf) + geom_point()
 ```
 
 ***
@@ -26,7 +32,8 @@ Response:
 Notes:
 
 ```{r ggplot Syntax}
-
+summary(pf$age)
+ggplot(aes(x = age, y = friend_count), data = pf) + geom_point() + xlim(13, 90)
 ```
 
 ***
@@ -35,7 +42,9 @@ Notes:
 Notes:
 
 ```{r Overplotting}
+ggplot(aes(x = age, y = friend_count), data = pf) + geom_point(alpha = 1/20) + xlim(13, 90)
 
+ggplot(aes(x = age, y = friend_count), data = pf) + geom_jitter(alpha = 1/20) + xlim(13, 90)
 ```
 
 #### What do you notice in the plot?
@@ -47,7 +56,7 @@ Response:
 Notes:
 
 ```{r Coord_trans()}
-
+ggplot(aes(x = age, y = friend_count), data = pf) + geom_point(alpha = 1/20, position = position_jitter(h = 0)) + xlim(13, 90) + coord_trans(y = 'sqrt')
 ```
 
 #### Look up the documentation for coord_trans() and add a layer to the plot that transforms friend_count using the square root function. Create your plot!
@@ -64,7 +73,7 @@ Notes:
 Notes:
 
 ```{r Alpha and Jitter}
-
+ggplot(aes(x = age, y = friendships_initiated), data = pf) + geom_point(alpha = 1/20, position = position_jitter(h = 0)) + coord_trans(y = 'sqrt') + scale_x_continuous(breaks = seq(10, 90, 5), limits = c(13, 90))
 ```
 
 ***
@@ -78,13 +87,37 @@ Notes:
 Notes:
 
 ```{r Conditional Means}
+install.packages('dplyr')
+library(dplyr)
+```
 
+
+```{r}
+age_groups <- group_by(pf, age)
+pf.fc_by_age <- summarise(age_groups,
+          friend_count_mean = mean(friend_count),
+          friend_count_median = median(friend_count),
+          n = n())
+
+pf.fc_by_age <- arrange(pf.fc_by_age, age)
+
+head(pf.fc_by_age)
+```
+```{r}
+pf.fc_by_age_alt_method <- pf %>%
+  group_by(age) %>%
+  summarise(friend_count_mean = mean(friend_count),
+            friend_count_median = median(friend_count),
+            n = n()) %>%
+  arrange(age)
+
+head(pf.fc_by_age_alt_method)
 ```
 
 Create your plot!
 
 ```{r Conditional Means Plot}
-
+ggplot(aes(x = age, y = friend_count_mean), data = pf.fc_by_age) + geom_line() + scale_x_continuous(breaks = seq(13, 90, 5), limits = c(13, 90))
 ```
 
 ***
@@ -93,7 +126,7 @@ Create your plot!
 Notes:
 
 ```{r Overlaying Summaries with Raw Data}
-
+ggplot(aes(x = age, y = friend_count), data = pf) + xlim(13, 90) + geom_point(alpha = 1/20, position = position_jitter(h = 0), color = 'orange') + coord_trans(y = 'sqrt') + geom_line(stat = 'summary', fun.y = mean) + geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.1), linetype = 2, color = 'blue') + geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.9), linetype = 2, color = 'blue') + geom_line(stat = 'summary', fun.y = quantile, fun.args = list(probs = 0.5), color = 'blue')
 ```
 
 #### What are some of your observations of the plot?
@@ -112,7 +145,9 @@ Notes:
 Notes:
 
 ```{r Correlation}
+cor.test(pf$age, pf$friend_count)
 
+with(pf, cor.test(age, friend_count, method = 'pearson'))
 ```
 
 Look up the documentation for the cor.test function.
@@ -126,7 +161,7 @@ Response:
 Notes:
 
 ```{r Correlation on Subsets}
-with(                 , cor.test(age, friend_count))
+with(subset(pf, pf$age <= 70), cor.test(age, friend_count))
 ```
 
 ***
@@ -140,7 +175,7 @@ Notes:
 Notes:
 
 ```{r}
-
+ggplot(aes(x = www_likes_received, y = likes_received), data = pf) + geom_point(alpha = 1/20) + coord_trans(x = 'sqrt', y = 'sqrt') + xlim(c(0, 2500)) + ylim(c(0, 2500))
 ```
 
 ***
@@ -149,13 +184,13 @@ Notes:
 Notes:
 
 ```{r Strong Correlations}
-
+ggplot(aes(x = www_likes_received, y = likes_received), data = pf) + geom_point(alpha = 1/20) + xlim(0, quantile(pf$www_likes_received, 0.95)) + ylim(0, quantile(pf$likes_received, 0.95)) + geom_smooth(method = 'lm', color = 'red')
 ```
 
 What's the correlation betwen the two variables? Include the top 5% of values for the variable in the calculation and round to 3 decimal places.
 
 ```{r Correlation Calcuation}
-
+with(pf, cor.test(www_likes_received, likes_received))
 ```
 
 Response:
